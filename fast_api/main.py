@@ -1,12 +1,14 @@
 from fastapi import FastAPI
 import uvicorn
+from fastapi import Request
 
 app = FastAPI()
 
 
 @app.get('/')
-def read_root():
-    return {'Hello': 'World'}
+def read_root(request: Request):
+    print(request)
+    return {'context': 'data'}
 
 
 if __name__ == '__main__':
