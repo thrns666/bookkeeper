@@ -7,7 +7,7 @@ app = FastAPI()
 
 @app.get('/')
 def read_root(request: Request):
-    print(request)
+    print(request.json())
     return {'context': 'data'}
 
 
