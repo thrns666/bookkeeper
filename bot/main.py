@@ -2,6 +2,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.filters import Command, CommandStart
 from aiogram.types import KeyboardButton, Message, ReplyKeyboardMarkup, ReplyKeyboardRemove, BotCommand
 import config
+from bot.ops import hello
 
 # Bot init
 

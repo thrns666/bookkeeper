@@ -5,11 +5,11 @@ from fastapi import Request
 app = FastAPI()
 
 
-@app.get('/')
-def read_root(request: Request):
-    print(request.json())
+@app.post('/')
+async def read_root(request: Request):
+    print(await request.json())
     return {'context': 'data'}
 
 
 if __name__ == '__main__':
-    uvicorn.run('main:app', port=8000, host='0.0.0.0', reload=True)
+    uvicorn.run('main:app', port=8080, host='0.0.0.0', reload=True)
