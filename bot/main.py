@@ -14,9 +14,9 @@ from bot.ops import hello
 app = FastAPI()
 
 TOKEN = config.bot_key  # need to change to dotenv (os.getenv(TOKEN_BOT))
-WEBHOOK_PATH = f'/bot/{TOKEN}'
-RENDER_WEBSERVICE_NAME = '<MY_RENDER_SERVICE>'
-WEBHOOK_URL = 'https://' + RENDER_WEBSERVICE_NAME + 'onrender.com' + WEBHOOK_PATH
+WEBHOOK_PATH = f'/bot/{TOKEN}'  # mb away out
+RENDER_WEBSERVICE_NAME = '<MY_RENDER_SERVICE>'  # i dont get it
+WEBHOOK_URL = 'https://' + RENDER_WEBSERVICE_NAME + 'onrender.com' + WEBHOOK_PATH   # (localhost.run tunnel https url)
 
 
 @app.on_event('startup')
@@ -86,7 +86,6 @@ def main_webhandler():
 
 
 # FastAPI server run
-
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host='127.0.0.1', port=8000, reload=True)
