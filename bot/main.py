@@ -7,16 +7,22 @@ from fastapi import FastAPI, Request
 import time
 import os
 import logging
-from bot.ops import hello
-
-# FastAPI init
-
-app = FastAPI()
+# from ops import hello
 
 TOKEN = config.bot_key  # need to change to dotenv (os.getenv(TOKEN_BOT))
 WEBHOOK_PATH = f'/bot/{TOKEN}'  # mb away out
 RENDER_WEBSERVICE_NAME = '<MY_RENDER_SERVICE>'  # i dont get it
-WEBHOOK_URL = 'https://' + RENDER_WEBSERVICE_NAME + 'onrender.com' + WEBHOOK_PATH   # (localhost.run tunnel https url)
+WEBHOOK_URL = 'https://70317ba093a291.lhr.life'   # (localhost.run tunnel https url)
+
+# Bot init
+
+logging.basicConfig(filemode='a', level=logging.INFO)
+bot: Bot = Bot(TOKEN)
+dp: Dispatcher = Dispatcher()
+
+# FastAPI init
+
+app = FastAPI()
 
 
 @app.on_event('startup')
@@ -26,12 +32,6 @@ async def on_start_up():
 
     if webhook_info.url != WEBHOOK_URL:
         await bot.set_webhook(url=WEBHOOK_URL)
-
-# Bot init
-
-logging.basicConfig(filemode='a', level=logging.INFO)
-bot: Bot = Bot(TOKEN)
-dp: Dispatcher = Dispatcher(Bot)
 
 
 # Filters for ex('+', '-')
@@ -55,7 +55,7 @@ async def command_start(message: Message):
     full_user_name = message.from_user.full_name
     logging.info(f'Start {user_id} {full_user_name} {time.asctime()}. Message: {message}')  # Need change to sql
     # Django drf connect, check user in db
-    await message.answer(text=hello(user_id=user_id, user_firstname=full_user_name))
+    await message.answer(text='hey start')
 
 
 @dp.message()
