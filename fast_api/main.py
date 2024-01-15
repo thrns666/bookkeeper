@@ -1,15 +1,14 @@
-from fastapi import FastAPI
 import uvicorn
-from fastapi import Request
+from fastapi import FastAPI, Request
+
 
 app = FastAPI()
 
 
-@app.post('/')
-async def read_root(request: Request):
-    print(await request.json())
-    return {'context': 'data'}
+@app.get('/')
+async def root(request: Request):
+    print(await request.body())
+    return {'hella': 'black'}
 
-
-if __name__ == '__main__':
-    uvicorn.run('main:app', port=8080, host='0.0.0.0', reload=True)
+if __name__ == "__main__":
+    uvicorn.run('main:app', port=8000, host='127.0.0.1', reload=True)
