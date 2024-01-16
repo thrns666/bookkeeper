@@ -1,37 +1,53 @@
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command, CommandStart
 from aiogram.types import KeyboardButton, Message, ReplyKeyboardMarkup, ReplyKeyboardRemove, BotCommand, Update
+from loguru import logger
+
 import config
 import uvicorn
 from fastapi import FastAPI, Request
 import time
-import os
+from io import open
 import logging
 # from ops import hello
 
+
 TOKEN = config.bot_key  # need to change to dotenv (os.getenv(TOKEN_BOT))
-WEBHOOK_PATH = f'/bot/{TOKEN}'  # mb away out
-RENDER_WEBSERVICE_NAME = '<MY_RENDER_SERVICE>'  # i dont get it
+WEBHOOK_PATH = f'/bot/{TOKEN}'
 WEBHOOK_URL = 'https://70317ba093a291.lhr.life'   # (localhost.run tunnel https url)
 
-# Bot init
 
-logging.basicConfig(filemode='a', level=logging.INFO)
+# Bot init
+logging.basicConfig(filemode='a', level=logging.INFO, filename='main_log.log')
 bot: Bot = Bot(TOKEN)
 dp: Dispatcher = Dispatcher()
 
+
 # FastAPI init
-
-app = FastAPI()
-
-
-@app.on_event('startup')
-async def on_start_up():
+@logger.catch
+async def lifespan():
     webhook_info = await bot.get_webhook_info()
     print(webhook_info)
 
     if webhook_info.url != WEBHOOK_URL:
         await bot.set_webhook(url=WEBHOOK_URL)
+    print('on startup')
+
+    yield
+
+    await bot.session.close()
+    print('shutdown')
+
+app = FastAPI(lifespan=lifespan)
+
+
+# @app.on_event('startup')   # change to lifespan()
+# async def on_start_up():
+#     webhook_info = await bot.get_webhook_info()
+#     print(webhook_info)
+#
+#     if webhook_info.url != WEBHOOK_URL:
+#         await bot.set_webhook(url=WEBHOOK_URL)
 
 
 # Filters for ex('+', '-')
@@ -75,9 +91,9 @@ async def bot_webhook(update: dict):
     await dp.update(tg_update)
 
 
-@app.on_event('shutdown')
-async def on_shutdown():
-    await bot.session.close()
+# @app.on_event('shutdown')
+# async def on_shutdown():
+#     await bot.session.close()
 
 
 @app.get('/')
@@ -86,6 +102,5 @@ def main_webhandler():
 
 
 # FastAPI server run
-
 if __name__ == '__main__':
     uvicorn.run('main:app', host='127.0.0.1', port=8000, reload=True)
