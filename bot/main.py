@@ -1,15 +1,40 @@
+from contextlib import asynccontextmanager
+from dto import users
+from sqlalchemy.orm import Session
+from models.users import User
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command, CommandStart
 from aiogram.types import KeyboardButton, Message, ReplyKeyboardMarkup, ReplyKeyboardRemove, BotCommand, Update
 from loguru import logger
-
 import config
 import uvicorn
 from fastapi import FastAPI, Request
-import time
-from io import open
-import logging
-# from ops import hello
+
+
+# DATABASE funcs
+def create_user(data: users.User, db: Session):
+    user = User(name=data.name)
+
+    try:
+        db.add(user)
+        db.commit()
+        db.refresh()
+    except Exception as e:
+        print(e)
+
+    return user
+
+
+def get_user(id: int, db):
+    return db.query(User), filter(User.id == id).first()
+
+
+def update(data: users.User, db: Session, id: int):
+    user = db.query( )
+
+
+
+
 
 
 TOKEN = config.bot_key  # need to change to dotenv (os.getenv(TOKEN_BOT))
@@ -18,14 +43,15 @@ WEBHOOK_URL = 'https://70317ba093a291.lhr.life'   # (localhost.run tunnel https 
 
 
 # Bot init
-logging.basicConfig(filemode='a', level=logging.INFO, filename='main_log.log')
+# logging.basicConfig(filemode='a', level=logging.INFO, filename='main_log.log')
 bot: Bot = Bot(TOKEN)
 dp: Dispatcher = Dispatcher()
 
 
 # FastAPI init
 @logger.catch
-async def lifespan():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     webhook_info = await bot.get_webhook_info()
     print(webhook_info)
 
@@ -69,7 +95,7 @@ async def menu_button(bot: Bot):
 async def command_start(message: Message):
     user_id = message.from_user.id
     full_user_name = message.from_user.full_name
-    logging.info(f'Start {user_id} {full_user_name} {time.asctime()}. Message: {message}')  # Need change to sql
+    # logging.info(f'Start {user_id} {full_user_name} {time.asctime()}. Message: {message}')  # Need change to sql
     # Django drf connect, check user in db
     await message.answer(text='hey start')
 
@@ -77,11 +103,11 @@ async def command_start(message: Message):
 @dp.message()
 async def default_handler(message: Message):
     try:
-        logging.info(f'Main: {message.from_user.id} {message.from_user.full_name} {time.asctime()}. Message: {message}')
+        # logging.info(f'Main: {message.from_user.id} {message.from_user.full_name} {time.asctime()}. Message: {message}')
         await message.reply('Default reply on user message')
     except:
-        logging.info(f'Main: {message.from_user.id} {message.from_user.full_name} {time.asctime()}. Message: {message}'
-                     f'. Error in default_handler')
+        # logging.info(f'Main: {message.from_user.id} {message.from_user.full_name} {time.asctime()}. Message: {message}'
+        #              f'. Error in default_handler')
         await message.reply('Something went wrong')
 
 
