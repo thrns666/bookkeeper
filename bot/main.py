@@ -9,6 +9,8 @@ from loguru import logger
 import config
 import uvicorn
 from fastapi import FastAPI, Request
+from database import SessionLocal, Base, engine
+from routers import user as UserRouter
 
 
 # DATABASE funcs
@@ -30,7 +32,20 @@ def get_user(id: int, db):
 
 
 def update(data: users.User, db: Session, id: int):
-    user = db.query( )
+    user = db.query(User).filter(User.id==id).first()
+    user.name = data.name
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return user
+
+
+def remove(db: Session, id: int):
+    user = db.query(User).filter(User.id==id).first()
+    db.commit()
+    return user
+
 
 
 
@@ -64,8 +79,10 @@ async def lifespan(app: FastAPI):
     await bot.session.close()
     print('shutdown')
 
-app = FastAPI(lifespan=lifespan)
 
+Base.metaadata.create_all(bind=engine)
+app = FastAPI(lifespan=lifespan)
+app.include_router(UserRouter.router, prefix='/user')
 
 # @app.on_event('startup')   # change to lifespan()
 # async def on_start_up():
@@ -122,7 +139,7 @@ async def bot_webhook(update: dict):
 #     await bot.session.close()
 
 
-@app.get('/')
+@app.get('/mainnet')
 def main_webhandler():
     return {'All': 'good'}
 
